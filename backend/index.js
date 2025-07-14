@@ -26,25 +26,31 @@ const __dirname = path.dirname(__filename);
 const app = express();
 mongoose.set('strictQuery', false);
 
-// ✅ Proper CORS Setup
+const isProd = process.env.NODE_ENV === 'production';
+const PORT = process.env.PORT || 2100;
+const FRONTEND_URL = isProd
+  ? process.env.FRONTEND_URL || 'https://finiqd-frontend.netlify.app'
+  : 'http://localhost:5173';
+
+// ✅ CORS setup
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: FRONTEND_URL,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true
+  credentials: true,
 }));
 
-// ✅ JSON Body Parser
 app.use(express.json());
 
-// ✅ Serve Uploaded Images
+// ✅ Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// ✅ Session and Passport Init
+// ✅ Session setup
 app.use(session({
   secret: process.env.SECRET || 'your_secret_key',
   resave: false,
   saveUninitialized: false,
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -57,26 +63,28 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/users', userRoutes);
 
-// ✅ Root Route
+// ✅ Health check
 app.get('/', (req, res) => {
   res.send('✅ Server is up and running!');
 });
 
-// ❌ 404 Route
+// ❌ 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: '❌ Route not found' });
 });
 
-// ✅ Global Error Handler
+// ✅ Global error handler
 app.use(errorHandler);
 
-// ✅ MongoDB Connection and Server Start
+// ✅ DB connect and launch
 mongoose.connect(process.env.MONGO_URL)
   .then(() => {
-    console.log('✅ Connected to MongoDB');
-    const PORT = process.env.PORT || 2100;
+    console.log('✅ Connected to MongoDB Atlas');
     app.listen(PORT, () => {
-      console.log(`🚀 Server running at http://localhost:${PORT}`);
+      const serverURL = isProd
+        ? 'https://finiqd-backend.onrender.com'
+        : `http://localhost:${PORT}`;
+      console.log(`🚀 Server running at ${serverURL}`);
     });
   })
   .catch(err => {
