@@ -10,11 +10,11 @@ router.get('/google', passport.authenticate('google', {
 
 // Step 2: Callback
 router.get('/google/callback', passport.authenticate('google', {
-  failureRedirect: 'http://localhost:3000/login',
+  failureRedirect: 'https://finiqd-frontend.netlify.app/login', // ✅ updated
 }), (req, res) => {
-  // Send token to frontend or redirect
-  const token = 'JWT_TOKEN_IF_NEEDED';
-  res.redirect(`http://localhost:3000/dashboard?token=${token}`);
+  const token = 'JWT_TOKEN_IF_NEEDED'; // Replace with real JWT if needed
+
+  res.redirect(`https://finiqd-frontend.netlify.app/dashboard?token=${token}`); // ✅ updated
 });
 
 export default router;
