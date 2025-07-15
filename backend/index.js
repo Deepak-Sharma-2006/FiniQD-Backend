@@ -41,6 +41,12 @@ app.use(cors({
 
 app.use(express.json());
 
+// ✅ Logger Middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // ✅ Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -84,7 +90,6 @@ mongoose.connect(process.env.MONGO_URL)
       const serverURL = isProd
         ? process.env.BACKEND_URL || 'https://finiqd-backend.onrender.com'
         : `http://localhost:${PORT}`;
-
       console.log(`🚀 Server running at ${serverURL}`);
     });
   })
