@@ -1,6 +1,7 @@
 // backend/routes/googleAuthRoute.js
 import express from 'express';
 import passport from 'passport';
+import jwt from 'jsonwebtoken';
 const router = express.Router();
 
 // Load environment variable
@@ -15,7 +16,13 @@ router.get('/google', passport.authenticate('google', {
 router.get('/google/callback', passport.authenticate('google', {
   failureRedirect: `${FRONTEND_URL}/login`,
 }), (req, res) => {
-  const token = 'JWT_TOKEN_IF_NEEDED'; // 🔁 Replace with real JWT logic
+  const user = req.user;
+
+  const token = jwt.sign(
+    { id: user._id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: '1d' }
+  );
 
   res.redirect(`${FRONTEND_URL}/dashboard?token=${token}`);
 });
