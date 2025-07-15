@@ -82,8 +82,9 @@ mongoose.connect(process.env.MONGO_URL)
     console.log('✅ Connected to MongoDB Atlas');
     app.listen(PORT, () => {
       const serverURL = isProd
-        ? 'https://finiqd-backend.onrender.com'
+        ? process.env.BACKEND_URL || 'https://finiqd-backend.onrender.com'
         : `http://localhost:${PORT}`;
+
       console.log(`🚀 Server running at ${serverURL}`);
     });
   })
