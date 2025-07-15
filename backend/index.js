@@ -28,9 +28,11 @@ mongoose.set('strictQuery', false);
 
 const isProd = process.env.NODE_ENV === 'production';
 const PORT = process.env.PORT || 2100;
-const FRONTEND_URL = isProd
-  ? process.env.FRONTEND_URL || 'https://finiqd-frontend.netlify.app'
-  : 'http://localhost:5173';
+
+// ✅ Use correct frontend URL from environment
+const FRONTEND_URL = process.env.FRONTEND_URL || (isProd
+  ? 'https://fin-iq.netlify.app'
+  : 'http://localhost:5173');
 
 // ✅ CORS setup
 app.use(cors({
@@ -40,12 +42,6 @@ app.use(cors({
 }));
 
 app.use(express.json());
-
-// ✅ Logger Middleware
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-  next();
-});
 
 // ✅ Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -90,6 +86,7 @@ mongoose.connect(process.env.MONGO_URL)
       const serverURL = isProd
         ? process.env.BACKEND_URL || 'https://finiqd-backend.onrender.com'
         : `http://localhost:${PORT}`;
+
       console.log(`🚀 Server running at ${serverURL}`);
     });
   })
